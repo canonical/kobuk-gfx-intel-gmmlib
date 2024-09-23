@@ -1,3 +1,9 @@
+intel-gmmlib (22.5.2-0ubuntu1~24.10~ppa1) oracular; urgency=medium
+
+  * Bump to 22.5.2
+
+ -- Shane McKee <shane.mckee@canonical.com>  Mon, 23 Sep 2024 20:42:55 +0800
+
 intel-gmmlib (22.5.1-0ubuntu1~24.10~ppa1) oracular; urgency=medium
 
   * Version bump to 22.5.1
