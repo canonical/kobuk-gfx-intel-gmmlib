@@ -45,7 +45,16 @@ bool GmmLib::GmmResourceInfoCommon::CopyClientParams(GMM_RESCREATE_PARAMS &Creat
         return false;
     }
     {
-        // Promote tiling options if caller does not provide any.
+        if ((GetGmmLibContext()->GetSkuTable().FtrXe2Compression) &&
+            (CreateParams.Type == RESOURCE_BUFFER) &&
+            (CreateParams.Flags.Info.Linear) &&
+            (CreateParams.Flags.Gpu.FlipChain))
+        {
+            CreateParams.Flags.Info.Linear = false;
+            CreateParams.Flags.Info.Tile4  = true;
+        }
+	
+	// Promote tiling options if caller does not provide any.
         // X/Y/W/L are tiling formats, and Yf/Ys are modifiers to the internal
         // ordering for Y and L macro-formats.
         if((CreateParams.Flags.Info.Linear +
@@ -59,7 +68,14 @@ bool GmmLib::GmmResourceInfoCommon::CopyClientParams(GMM_RESCREATE_PARAMS &Creat
                CreateParams.Flags.Info.ExistingSysMem)
             {
                 CreateParams.Flags.Info.Linear = true;
-            }
+
+                if ((GetGmmLibContext()->GetSkuTable().FtrXe2Compression) &&
+                    CreateParams.Flags.Gpu.FlipChain && (CreateParams.Type == RESOURCE_BUFFER))
+                {
+                    CreateParams.Flags.Info.Linear = false;
+                    CreateParams.Flags.Info.Tile4  = true;
+                }
+	    }
 
             if(GetGmmLibContext()->GetSkuTable().FtrTileY)
             {
@@ -672,6 +688,18 @@ uint8_t GMM_STDCALL GmmLib::GmmResourceInfoCommon::ValidateParams()
             Surf.Flags.Info.NotCompressed = 1; //Disable compression if displayable are not tile4
         }
     }
+
+#ifndef __GMM_KMD__
+    if (GetGmmLibContext()->GetSkuTable().FtrXe2Compression && (GetGmmClientContext() != NULL))
+    {
+        if (((GMM_AIL_STRUCT *)(GetGmmClientContext()->GmmGetAIL()))->AilDisableXe2CompressionRequest)
+        {
+            //Disable Compression at resource level only, However at adapter level FtrXe2Compression could be still enabled.
+            //AilDisableXe2CompressionRequest helps us to acheive this.
+            Surf.Flags.Info.NotCompressed = 1;
+        }
+    }
+#endif
 
     if((GFX_GET_CURRENT_RENDERCORE(pPlatformResource->Platform) < IGFX_GEN8_CORE) &&
        Surf.Flags.Info.TiledW)
