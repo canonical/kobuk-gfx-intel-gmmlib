@@ -1,3 +1,9 @@
+intel-gmmlib (22.8.1-0ubuntu1~25.04~ppa1) plucky; urgency=medium
+
+  * Update to version 22.8.1 
+
+ -- Pavel Androniychuk <pavel.androniychuk@intel.com>  Tue, 05 Aug 2025 11:14:54 -0700
+
 intel-gmmlib (22.8.0-0ubuntu1~25.05~ppa1) plucky; urgency=medium
 
   * Update to version 22.8.0
